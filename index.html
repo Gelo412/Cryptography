@@ -34,6 +34,16 @@
             opacity: 0.5;
         }
     }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
     .background-objects {
         position: absolute;
@@ -64,6 +74,10 @@
     .circle:nth-child(9) { top: 85%; left: 80%; animation-duration: 6s; }
     .circle:nth-child(10) { top: 30%; left: 35%; animation-duration: 6s; }
     
+    h2, h3, textarea, input, button {
+        animation: fadeIn 1s ease-in-out;
+    }
+
 
     h2 {
         margin-bottom: 20px;
@@ -125,6 +139,15 @@
         background: rgba(255, 255, 255, 0.1);
         color: white;
         border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    @media screen and (max-width: 600px) {
+        textarea, input {
+            width: 90%;
+        }
+        .circle {
+            width: 60px;
+            height: 60px;
+        }
     }
 
 </style>
