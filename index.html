@@ -1,0 +1,94 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encryption & Decryption</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        textarea {
+            width: 300px;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>Encryption & Decryption</h2>
+    <textarea id="inputText" placeholder="Enter text"></textarea>
+    <input type="password" id="password" placeholder="Enter key">
+    <button onclick="encryptText()">Encrypt</button>
+    <button onclick="decryptText()">Decrypt</button>
+    <h3>Output:</h3>
+    <textarea id="outputText" readonly></textarea>
+
+    <script>
+        async function encryptText() {
+            const text = document.getElementById("inputText").value;
+            const password = document.getElementById("password").value;
+            
+            if (!text || !password) {
+                alert("Please enter both text and password.");
+                return;
+            }
+            
+            const encoder = new TextEncoder();
+            const key = await crypto.subtle.digest("SHA-256", encoder.encode(password));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            
+            const algorithm = { name: "AES-GCM", iv: iv };
+            const cryptoKey = await crypto.subtle.importKey("raw", key, algorithm, false, ["encrypt"]);
+            
+            const encrypted = await crypto.subtle.encrypt(algorithm, cryptoKey, encoder.encode(text));
+            
+            const encryptedData = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+            const ivData = btoa(String.fromCharCode(...iv));
+            document.getElementById("outputText").value = ivData + ":" + encryptedData;
+        }
+        
+        async function decryptText() {
+            const input = document.getElementById("inputText").value;
+            const password = document.getElementById("password").value;
+            
+            if (!input || !password) {
+                alert("Please enter both encrypted text and password.");
+                return;
+            }
+            
+            const [ivData, encryptedData] = input.split(":");
+            if (!ivData || !encryptedData) {
+                alert("Invalid encrypted text format.");
+                return;
+            }
+            
+            const iv = new Uint8Array(atob(ivData).split("").map(c => c.charCodeAt(0)));
+            const encrypted = new Uint8Array(atob(encryptedData).split("").map(c => c.charCodeAt(0)));
+            
+            const encoder = new TextEncoder();
+            const key = await crypto.subtle.digest("SHA-256", encoder.encode(password));
+            
+            const algorithm = { name: "AES-GCM", iv: iv };
+            const cryptoKey = await crypto.subtle.importKey("raw", key, algorithm, false, ["decrypt"]);
+            
+            try {
+                const decrypted = await crypto.subtle.decrypt(algorithm, cryptoKey, encrypted);
+                document.getElementById("outputText").value = new TextDecoder().decode(decrypted);
+            } catch (e) {
+                alert("Decryption failed. Incorrect password or invalid data.");
+            }
+        }
+    </script>
+</body>
+</html>
