@@ -177,10 +177,10 @@
             }
             
             const encoder = new TextEncoder();
-            const key = await crypto.subtle.digest("SHA-256", encoder.encode(password));//SHA-256 "produces a fixed-size 256-bit hash value from input data of any size"
+            const key = await crypto.subtle.digest("SHA-256", encoder.encode(password));//SHA-256 (Secure Hash Algorithm 256-bit) "produces a fixed-size 256-bit hash value from input data of any size"
             const iv = crypto.getRandomValues(new Uint8Array(12)); // range 0-255
             
-            const algorithm = { name: "AES-GCM", iv: iv };// AES-GCM "a symmetric encryption algorithm that encrypts and authenticates data"
+            const algorithm = { name: "AES-GCM", iv: iv };// AES-GCM (Advanced Encryption Standard with Galois/Counter Mode) "a symmetric encryption algorithm that encrypts and authenticates data"
             const cryptoKey = await crypto.subtle.importKey("raw", key, algorithm, false, ["encrypt"]);
             
             const encrypted = await crypto.subtle.encrypt(algorithm, cryptoKey, encoder.encode(text));
