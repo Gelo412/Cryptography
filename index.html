@@ -5,36 +5,168 @@
     <title>Encryption & Decryption</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f4f4f4;
+        font-family: 'Poppins', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-image: url(cd4.jpg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        color: white;
+        margin: 0;
+        overflow: hidden;
+        position: relative;
+    }
+
+    @keyframes moveObjects {
+        0% {
+            transform: translateY(0px);
+            opacity: 0.5;
         }
-        textarea {
-            width: 300px;
-            height: 100px;
-            margin-bottom: 10px;
+        50% {
+            transform: translateY(-20px);
+            opacity: 1;
         }
-        button {
-            margin: 5px;
-            padding: 10px;
-            cursor: pointer;
+        100% {
+            transform: translateY(0px);
+            opacity: 0.5;
         }
-    </style>
+    }
+
+    .background-objects {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+    }
+
+    .circle {
+        position: absolute;
+        width: 90px;
+        height: 90px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        animation: moveObjects 4s infinite ease-in-out;
+    }
+
+    .circle:nth-child(1) { top: 10%; left: 20%; animation-duration: 6s; }
+    .circle:nth-child(2) { top: 40%; left: 80%; animation-duration: 8s; }
+    .circle:nth-child(3) { top: 70%; left: 50%; animation-duration: 5s; }
+    .circle:nth-child(4) { top: 5%; left: 5%; animation-duration: 7s; }
+    .circle:nth-child(5) { top: 10%; left: 90%; animation-duration: 6s; }
+    .circle:nth-child(6) { top: 60%; left: 70%; animation-duration: 6s; }
+    .circle:nth-child(7) { top: 50%; left: 20%; animation-duration: 6s; }
+    .circle:nth-child(8) { top: 70%; left: 10%; animation-duration: 6s; }
+    .circle:nth-child(9) { top: 85%; left: 80%; animation-duration: 6s; }
+    .circle:nth-child(10) { top: 30%; left: 35%; animation-duration: 6s; }
+    
+
+    h2 {
+        margin-bottom: 20px;
+    }
+
+    textarea, input {
+        width: 320px;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: none;
+        font-size: 16px;
+        outline: none;
+        transition: 0.3s;
+    }
+    .password-container {
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+    .password-container input {
+        flex: 1;
+        padding-right: 40px;
+    }
+    .password-container button {
+        position: absolute;
+        right: 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    textarea {
+        height: 100px;
+        resize: none;
+    }
+
+    input {
+        height: 40px;
+    }
+
+    button {
+        padding: 12px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;   
+    }
+
+    button:hover {
+        opacity: 0.8;
+    }
+
+    textarea#outputText {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+</style>
 </head>
 <body>
     <h2>Encryption & Decryption</h2>
     <textarea id="inputText" placeholder="Enter text"></textarea>
-    <input type="password" id="password" placeholder="Enter key">
+    <div style="position: relative; display: inline-block;">
+        <input type="password" id="password" placeholder="Enter key">
+        <button id="togglePassword" style="position: absolute; right: 0px; top: 2px; background: none; border: none; cursor: pointer;">👁️</button>
+    </div>
     <button onclick="encryptText()">Encrypt</button>
     <button onclick="decryptText()">Decrypt</button>
     <h3>Output:</h3>
     <textarea id="outputText" readonly></textarea>
+    <!-- Background objects for animation -->
+    <div class="background-objects">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
 
     <script>
+        // password 
+        document.getElementById("togglePassword").addEventListener("click", function() {
+            const passwordInput = document.getElementById("password");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                this.textContent = "🙈";
+            } else {
+                passwordInput.type = "password";
+                this.textContent = "👁️";
+            }
+        });
+        // encryption
         async function encryptText() {
             const text = document.getElementById("inputText").value;
             const password = document.getElementById("password").value;
@@ -45,10 +177,10 @@
             }
             
             const encoder = new TextEncoder();
-            const key = await crypto.subtle.digest("SHA-256", encoder.encode(password));
-            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const key = await crypto.subtle.digest("SHA-256", encoder.encode(password));//SHA-256 "produces a fixed-size 256-bit hash value from input data of any size"
+            const iv = crypto.getRandomValues(new Uint8Array(12)); // range 0-255
             
-            const algorithm = { name: "AES-GCM", iv: iv };
+            const algorithm = { name: "AES-GCM", iv: iv };// AES-GCM "a symmetric encryption algorithm that encrypts and authenticates data"
             const cryptoKey = await crypto.subtle.importKey("raw", key, algorithm, false, ["encrypt"]);
             
             const encrypted = await crypto.subtle.encrypt(algorithm, cryptoKey, encoder.encode(text));
@@ -57,7 +189,7 @@
             const ivData = btoa(String.fromCharCode(...iv));
             document.getElementById("outputText").value = ivData + ":" + encryptedData;
         }
-        
+        //decryption
         async function decryptText() {
             const input = document.getElementById("inputText").value;
             const password = document.getElementById("password").value;
